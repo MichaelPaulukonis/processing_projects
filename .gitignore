@@ -1,0 +1,5 @@
+# Output artifacts
+*.png
+*.jpg
+*.mp4
+.DS_Store
