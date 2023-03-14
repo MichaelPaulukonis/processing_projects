@@ -27,26 +27,38 @@ class Cell {
   }
 
   Cell clone() {
-    // TODO: need to clone the img, or when original changes this changes
-    // or that's okay?
-   return new Cell(img, x, y, w, h, fadeSteps); 
+    return new Cell(img, x, y, w, h, fadeSteps);
   }
 
+  Boolean vanished() {
+    return (transparency <= 0);
+  }
+
+  Boolean visible() {
+    return (transparency == 255);
+  }
+
+  Cell reset() {
+    currentStep = 0;
+    direction = -1;
+    currentLoop = 0;
+    transparency = 255;
+    runningEffect = false;
+    return this;
+  }
+
+
   Cell replaceImage(PImage image) {
-     img = image;
-     return this;
+    img = image;
+    return this;
   }
 
   Cell update() {
     if (runningEffect) {
-      transparency = transparency + (currentStep * direction * reduceBy);
-      currentStep++; // oops!!!!! need ot modulo by numSteps
+      transparency = transparency + (direction * reduceBy);
+      currentStep++; // oops!!!!! need to modulo by numSteps
 
       if (currentStep > fadeSteps || currentStep < 0) {
-        direction = -direction;
-        currentLoop++;
-      }
-      if (currentLoop > loops) {
         runningEffect = false;
       }
     }
