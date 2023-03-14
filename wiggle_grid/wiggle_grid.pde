@@ -7,12 +7,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.Collections;
 
-int canvasWidth = 1080;
+int canvasWidth = 800;
 int canvasHeight = canvasWidth;
 int offset = 20;
-int count = 3;
-Cell[] grid;
+int count = 4;
+FadeCell[] grid;
 int cols = count;
 int rows = count;
 int fadeSteps = 3;
@@ -20,9 +22,10 @@ int skip = 0;
 Boolean mainLoopDone = false;
 
 PImage bkgImg;
-ArrayList<String> images;
+ArrayList<String> imageFilenames;
 String imageFolder = "/Users/michaelpaulukonis/Documents/processing_projects/wiggle_grid/input/";
 ArrayList<PImage> loadedImages;
+ArrayList<PImage> loadedImagesOriginal;
 
 int imgSize = ((canvasWidth - offset) / count)- (1 * offset);
 
@@ -41,34 +44,24 @@ public ArrayList<String> listFiles(String dir) throws IOException {
   }
 }
 
-public static String randomFile(ArrayList<String> list) {
-  int size = list.size();
-  int randIdx = new Random().nextInt(size);
-
-  String randomElem = list.get(randIdx);
-  return randomElem;
-}
-
-PImage loadRandomImage() {
-  return loadImage(imageFolder + randomFile(images));
-}
-
 PImage getRandomImage() {
-  int size = loadedImages.size();
-  int randIdx = new Random().nextInt(size);
-
-  PImage randomElem = loadedImages.get(randIdx);
-  return randomElem;
+  if (loadedImages.size() == 0) {
+    loadedImages = new ArrayList<PImage>(loadedImagesOriginal);
+    Collections.shuffle(loadedImages);
+  }
+  return loadedImages.remove(0);
 }
 
-// doh! we can repeat images, so.... aaaargh!
-// need to do a hash or something, do not pick again until exhausted
-// then reset
 ArrayList<PImage> preLoadImages(int numImages) {
   println("numImages to load: ", numImages);
+  ArrayList<String> shuffledNames = new ArrayList<String>();
   ArrayList<PImage> images = new ArrayList<PImage>();
   for (int i = 0; i < numImages; i++) {
-    PImage img = loadRandomImage();
+    if (shuffledNames.size() == 0) {
+      shuffledNames = new ArrayList<String>(imageFilenames);
+      Collections.shuffle(shuffledNames);
+    }
+    PImage img = loadImage(imageFolder + shuffledNames.remove(0));
     img.resize(imgSize, imgSize);
     images.add(img);
   }
@@ -81,22 +74,23 @@ void settings() {
 
 void setup() {
   try {
-    images = listFiles(imageFolder);
+    imageFilenames = listFiles(imageFolder);
   }
   catch(IOException error) {
     println(error);
   }
   loadedImages = preLoadImages((rows * cols) + 5);
+  loadedImagesOriginal = new ArrayList<PImage>(loadedImages);
 
   bkgImg = loadImage("input/mona.square.00.png");
-  grid = new Cell[rows * cols];
+  grid = new FadeCell[rows * cols];
   for (int i = 0; i < rows * cols; i++) {
     int row = i % count;
     int col = i / count;
     int offsetX = (row + 1) * offset + (row * imgSize);
     int offsetY = (col + 1) * offset + (col * imgSize);
     int randomFadeSteps = getRandomNumber(3, 10);
-    grid[i] = new Cell(getRandomImage(), offsetX, offsetY, imgSize, imgSize, randomFadeSteps);
+    grid[i] = new FadeCell(getRandomImage(), offsetX, offsetY, imgSize, imgSize, randomFadeSteps);
   }
 }
 
@@ -105,7 +99,7 @@ void draw() {
   image(bkgImg, 0, 0, canvasWidth, canvasHeight);
   if (!mainLoopDone) {
     for (int j = 0; j < rows * cols; j++) {
-      Cell cell = grid[j];
+      FadeCell cell = grid[j];
       if (j == skip) {
         cell.startEffect();
       }
@@ -118,7 +112,7 @@ void draw() {
   } else {
     allVisible = true;
     for (int j = 0; j < rows * cols; j++) {
-      Cell cell = grid[j];
+      FadeCell cell = grid[j];
       if (cell.vanished()) {
         cell.replaceImage(getRandomImage()).reset();
       }

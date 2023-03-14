@@ -1,6 +1,6 @@
 
-// A Cell object
-class Cell {
+// A FadeCell object
+class FadeCell implements ICell {
   // A cell object knows about its location in the grid
   // as well as its size with the variables x,y,w,h
   float x, y;   // x,y location
@@ -15,8 +15,8 @@ class Cell {
   PImage img;
   Boolean runningEffect = false;
 
-  // Cell Constructor
-  Cell(PImage i, float tempX, float tempY, float tempW, float tempH, int steps) {
+  // FadeCell Constructor
+  FadeCell(PImage i, float tempX, float tempY, float tempW, float tempH, int steps) {
     img = i;
     x = tempX;
     y = tempY;
@@ -26,8 +26,8 @@ class Cell {
     reduceBy = transparency / fadeSteps;
   }
 
-  Cell clone() {
-    return new Cell(img, x, y, w, h, fadeSteps);
+  FadeCell clone() {
+    return new FadeCell(img, x, y, w, h, fadeSteps);
   }
 
   Boolean vanished() {
@@ -38,7 +38,7 @@ class Cell {
     return (transparency == 255);
   }
 
-  Cell reset() {
+  FadeCell reset() {
     currentStep = 0;
     direction = -1;
     currentLoop = 0;
@@ -47,13 +47,12 @@ class Cell {
     return this;
   }
 
-
-  Cell replaceImage(PImage image) {
+  FadeCell replaceImage(PImage image) {
     img = image;
     return this;
   }
 
-  Cell update() {
+  FadeCell update() {
     if (runningEffect) {
       transparency = transparency + (direction * reduceBy);
       currentStep++; // oops!!!!! need to modulo by numSteps
@@ -65,12 +64,12 @@ class Cell {
     return this;
   }
 
-  Cell startEffect() {
+  FadeCell startEffect() {
     runningEffect = true;
     return this;
   }
 
-  Cell draw() {
+  FadeCell draw() {
     tint(255, transparency);
     image(img, x, y, w, h);
     tint(255, 255);
