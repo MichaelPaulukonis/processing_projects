@@ -2,4 +2,7 @@
 *.png
 *.jpg
 *.mp4
+*.tga
+*.gif
+*.jpeg
 .DS_Store
