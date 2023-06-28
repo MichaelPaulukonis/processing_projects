@@ -14,7 +14,7 @@ int canvasWidth = 800;
 int canvasHeight = canvasWidth;
 int offset = 20;
 int count = 4;
-FadeCell[] grid;
+ICell[] grid;
 int cols = count;
 int rows = count;
 int fadeSteps = 3;
@@ -94,12 +94,17 @@ void setup() {
   }
 }
 
+// TODO: get this to work with wiggles
+// then figure out how to do both
+// doh! a cell should not be of an effect type
+// a cell should _contain_ effect types!
+// so multiples, and all that.
 void draw() {
   Boolean allVisible = false;
   image(bkgImg, 0, 0, canvasWidth, canvasHeight);
   if (!mainLoopDone) {
     for (int j = 0; j < rows * cols; j++) {
-      FadeCell cell = grid[j];
+      FadeCell cell = (FadeCell)grid[j];
       if (j == skip) {
         cell.startEffect();
       }
@@ -112,7 +117,46 @@ void draw() {
   } else {
     allVisible = true;
     for (int j = 0; j < rows * cols; j++) {
-      FadeCell cell = grid[j];
+      FadeCell cell = (FadeCell)grid[j];
+      // TODO: needs to be something common to the interface?
+      if (cell.vanished()) {
+        cell.replaceImage(getRandomImage()).reset();
+      }
+      cell.update().draw();
+      allVisible = allVisible && cell.visible();
+    }
+  }
+
+  if (skip > rows * cols) {
+    mainLoopDone = true;
+  }
+
+  if (allVisible) {
+    noLoop();
+  }
+  saveFrame("output/movie/monas.missing.####.png");
+}
+
+void drawFadeCells() {
+  Boolean allVisible = false;
+  image(bkgImg, 0, 0, canvasWidth, canvasHeight);
+  if (!mainLoopDone) {
+    for (int j = 0; j < rows * cols; j++) {
+      FadeCell cell = (FadeCell)grid[j];
+      if (j == skip) {
+        cell.startEffect();
+      }
+      cell.update().draw();
+      if (cell.vanished()) {
+        cell.replaceImage(getRandomImage()).reset().startEffect();
+      }
+    }
+    skip++;
+  } else {
+    allVisible = true;
+    for (int j = 0; j < rows * cols; j++) {
+      FadeCell cell = (FadeCell)grid[j];
+      // TODO: needs to be something common to the interface?
       if (cell.vanished()) {
         cell.replaceImage(getRandomImage()).reset();
       }
