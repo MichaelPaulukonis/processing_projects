@@ -8,7 +8,7 @@ int canvasHeight = canvasWidth;
 Layers layers;
 boolean shiftIsPressed = false;
 
-String root = "/Users/michaelpaulukonis//projects/processing_projects/nancy_ha_ha/";
+String root = "/Users/michaelpaulukonis//projects/processing_projects_orig/nancy_ha_ha/";
 String componentPath = "input/components";
 String nancyComponentPath = "input/components.nancy";
 String overlayPath = "input/overlays";

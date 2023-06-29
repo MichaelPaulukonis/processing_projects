@@ -8,7 +8,7 @@ class Layers {
   Element nancyElement;
 
   Layers() {
-    pg = createGraphics(4000, 4000);
+    pg = createGraphics(2000, 2000);
 
     setRandomBackground();
     setRandomNancy();
@@ -33,9 +33,14 @@ class Layers {
   Element setRandomNancy() {
     PImage nancy = loadImage(getRandomFile(nancys));
     if (nancyElement == null) {
-      nancyElement = new Element(nancy);
+      //nancyElement = new Element(nancy);
+      //Element(PImage img, int offsetVelocityMin, int offsetVelocityMax, int offsetVelocitySteps,
+      //int xmin, int xmax, int ymin, int ymax,
+      //float sizeMin, float sizeMax, float svMin, float svMax, int sizeStepsMin, int sizeStepsMax)
+      //nancyElement = new Element(nancy, -20, 20, 5, 10, -750, 750, -250, 750, 0.75, 3, -0.02, 0.02, 5, 10);
+      nancyElement = new Element(nancy, -20, 20, 5, 10, -750, 750, -250, 750, 1, 1, 0, 0, 1, 1);
     } else {
-       nancyElement.setImage(nancy);
+      nancyElement.setImage(nancy);
     }
     dirty = true;
     return nancyElement;
@@ -71,7 +76,7 @@ class Layers {
     pg.beginDraw();
     pg.imageMode(CENTER);
     pg.image(bkgnd, pg.width/2, pg.height/2, (float)bd.width, (float)bd.height); // needs to be proportional to original
-    pg.image(nancyElement.image(), pg.width/2 + nancyElement.location().x, pg.height/2 + nancyElement.location().y, pg.width * nancyElement.size(), pg.height * nancyElement.size());
+    pg.image(nancyElement.image(), pg.width/2 + nancyElement.locationOffset().x, pg.height/2 + nancyElement.locationOffset().y, pg.width * nancyElement.size(), pg.height * nancyElement.size());
 
     pg.image(borderOverlay, pg.width/2, pg.height/2, pg.width, pg.height);
     pg.endDraw();
