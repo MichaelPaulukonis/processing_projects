@@ -40,16 +40,6 @@ String timestamp() {
   return year() + nf(month(), 2) + nf(day(), 2) + "-"  + nf(hour(), 2) + nf(minute(), 2) + nf(second(), 2);
 }
 
-Dimension getScaledDimension(Dimension imageSize, Dimension boundary) {
-
-  double widthRatio = boundary.getWidth() / imageSize.getWidth();
-  double heightRatio = boundary.getHeight() / imageSize.getHeight();
-  double ratio = Math.max(widthRatio, heightRatio);
-
-  return new Dimension((int) (imageSize.width  * ratio),
-    (int) (imageSize.height * ratio));
-}
-
 void setup() {
   imageMode(CENTER);
   size(800, 800); // allows it to fit on screen so I can see it
@@ -57,7 +47,7 @@ void setup() {
 }
 
 void draw() {
-  layers.moveNancy();
+  layers.update();
   image(layers.rendered(), width/2, height/2, width, height);
 }
 

@@ -1,4 +1,28 @@
+class OffsetVelocity {
+  int min;
+  int max;
+  int stepsMin;
+  int stepsMax;
+}
+
+class OffsetLocation {
+  int xmin;
+  int xmax;
+  int ymin;
+  int ymax;
+}
+
+class OffsetSize {
+  float min;
+  float max;
+  float velocityMin;
+  float velocityMax;
+  int sizeStepsMin;
+  int sizeStepsMax;
+}
+
 class Element {
+  int[] modes = { ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, REPLACE };
   PVector locationOffset;
   PVector offsetVelocity;
   float size;
@@ -23,7 +47,7 @@ class Element {
   float svMax;
   int sizeStepsMin;
   int sizeStepsMax;
-
+  int bMode = BLEND;
 
   Element(PImage img) {
     setLocationOffset();
@@ -32,13 +56,17 @@ class Element {
     components[0] = img;
   }
 
-  // TODO: the signature is AWFUL!!!!!
-  Element(PImage img, int offsetVelocityMin, int offsetVelocityMax, int offsetVelocityStepsMin, int offsetVelocityStepsMax,
-    int xmin, int xmax, int ymin, int ymax,
-    float sizeMin, float sizeMax, float svMin, float svMax, int sizeStepsMin, int sizeStepsMax) {
-    setOffsetVelocity(offsetVelocityMin, offsetVelocityMax, offsetVelocityStepsMin, offsetVelocityStepsMax);
-    setLocationOffset(xmin, xmax, ymin, ymax);
-    setSizeVelocity(sizeMin, sizeMax, svMin, svMax, sizeStepsMin, sizeStepsMax);
+  Element(PImage[] imgs, OffsetVelocity velocity, OffsetLocation location, OffsetSize size) {
+    this(imgs[0], velocity, location, size);
+    components[1] = imgs[1];
+    int index = (int)random(modes.length);
+    bMode = modes[index];  
+  }
+
+  Element(PImage img, OffsetVelocity velocity, OffsetLocation location, OffsetSize size) {
+    setOffsetVelocity(velocity.min, velocity.max, velocity.stepsMin, velocity.stepsMax);
+    setLocationOffset(location.xmin, location.xmax, location.ymin, location.ymax);
+    setSizeVelocity(size.min, size.max, size.velocityMin, size.velocityMax, size.sizeStepsMin, size.sizeStepsMax);
     components[0] = img;
   }
 
