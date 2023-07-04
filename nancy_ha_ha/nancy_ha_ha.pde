@@ -71,7 +71,9 @@ void keyPressed() {
     layers.randomize();
   } else if (key == 'b' || key == 'B') {
     layers.setRandomBackground();
-  } else if (key == 'n' || key == 'N') {
+  } else if (key == 'n') {
+    layers.newNancyImage();
+  } else if (key == 'N') {
     layers.setRandomNancy();
   } else if (key == 'o' || key == 'O') {
     layers.setRandomBorder();

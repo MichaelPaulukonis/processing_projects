@@ -66,34 +66,37 @@ class Layers {
     dirty = true;
   }
 
+  Element newNancyImage() {
+    PImage nancy = loadImage(getRandomFile(nancys));
+    nancyElement.setImage(nancy);
+    dirty = true;
+    return nancyElement;
+  }
+
   Element setRandomNancy() {
     PImage nancy = loadImage(getRandomFile(nancys));
-    if (nancyElement == null) {
 
-      OffsetVelocity velocity = new OffsetVelocity();
-      velocity.min = -20;
-      velocity.max = 20;
-      velocity.stepsMin = 5;
-      velocity.stepsMax = 10;
+    OffsetVelocity velocity = new OffsetVelocity();
+    velocity.min = -20;
+    velocity.max = 20;
+    velocity.stepsMin = 5;
+    velocity.stepsMax = 10;
 
-      OffsetLocation location = new OffsetLocation();
-      location.xmin = -750;
-      location.xmax = 750;
-      location.ymin = -250;
-      location.ymax = 750;
+    OffsetLocation location = new OffsetLocation();
+    location.xmin = -750;
+    location.xmax = 750;
+    location.ymin = -250;
+    location.ymax = 750;
 
-      OffsetSize size = new OffsetSize();
-      size.min = 1;
-      size.min = 1;
-      size.velocityMin = 0;
-      size.velocityMax = 0;
-      size.sizeStepsMin = 1;
-      size.sizeStepsMax = 1;
+    OffsetSize size = new OffsetSize();
+    size.min = 1;
+    size.min = 1;
+    size.velocityMin = 0;
+    size.velocityMax = 0;
+    size.sizeStepsMin = 1;
+    size.sizeStepsMax = 1;
 
-      nancyElement = new Element(nancy, velocity, location, size);
-    } else {
-      nancyElement.setImage(nancy);
-    }
+    nancyElement = new Element(nancy, velocity, location, size);
     dirty = true;
     return nancyElement;
   }
@@ -106,10 +109,10 @@ class Layers {
   void update() {
     nancyElement.update();
     borderElement.update();
-    //println("pre-update", backgroundElement.locationOffset.x, backgroundElement.locationOffset.y, backgroundElement.currentStep, backgroundElement.steps);
     backgroundElement.update();
-    //println("post-update", backgroundElement.locationOffset.x, backgroundElement.locationOffset.y, backgroundElement.currentStep, backgroundElement.steps);
     background2.update();
+    println("b size :", backgroundElement.size, backgroundElement.sizeMin, backgroundElement.sizeMax);
+    println("b2 size :", background2.size, background2.sizeMin, background2.sizeMax);
     dirty = true;
   }
 

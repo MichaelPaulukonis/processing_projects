@@ -106,7 +106,9 @@ class Element {
   void setSizeVelocity(float min, float max, float svMin, float svMax, int stepsMin, int stepsMax) {
     // TODO: we don't always reset the size,
     // normally just the velocity, and steps
-    size = random(min, max);
+    this.sizeMin = min;
+    this.sizeMax = max;
+    setRandomSize(min, max);
     this.svMin = svMin;
     this.svMax = svMax;
     this.sizeStepsMin = stepsMin;
@@ -120,11 +122,19 @@ class Element {
     currentSizeStep = 0;
   }
 
+  void setRandomSize(float min, float max) {
+    this.size = random(min, max);
+  }
+
   Element updateSize() {
     size += sizeVelocity;
+    if (size >= this.sizeMax || size <= this.sizeMin ) {
+      sizeVelocity = -sizeVelocity;
+    }
+    size = max(min(size, this.sizeMax), this.sizeMin);
     currentSizeStep++;
     if (currentSizeStep >= sizeSteps) {
-      resetSizeVelocity(); // oooh, we have to save the original parameters!!!
+      resetSizeVelocity();
     }
     return this;
   }
