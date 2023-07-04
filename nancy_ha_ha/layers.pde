@@ -1,13 +1,19 @@
 class Layers {
-  PImage bkgnd;
   PImage borderOverlay;
   PImage[] components;
   PGraphics pg;
   Dimension bd;
+  Dimension b2d;
   Boolean dirty = true;
   Element nancyElement;
   Element backgroundElement;
+  Element background2;
   Element borderElement;
+  Element freeFloater;
+
+  int bMode = BLEND;
+
+  int[] modes = { ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, REPLACE };
 
   Layers() {
     pg = createGraphics(2000, 2000);
@@ -25,30 +31,45 @@ class Layers {
 
 
   // returns an image AND sets it. ugh. void? side-effects?
-  PImage setRandomBackground() {
-    bkgnd = loadImage(getRandomFile(backgrounds));
+  void setRandomBackground() {
+    PImage bkgnd = loadImage(getRandomFile(backgrounds));
+    PImage b2 = loadImage(getRandomFile(backgrounds));
     bd = getScaledDimension(new Dimension(bkgnd.width, bkgnd.height), new Dimension(pg.width, pg.height));
+    b2d = getScaledDimension(new Dimension(b2.width, b2.height), new Dimension(pg.width, pg.height));
 
-    //Element(PImage img, int offsetVelocityMin, int offsetVelocityMax, int offsetVelocitySteps,
-    //int xmin, int xmax, int ymin, int ymax,
-    //float sizeMin, float sizeMax, float svMin, float svMax, int sizeStepsMin, int sizeStepsMax)
-    //nancyElement = new Element(nancy, -20, 20, 5, 10, -750, 750, -250, 750, 0.75, 3, -0.02, 0.02, 5, 10);
-    // aw crap, there's no scaling in the Element. HAH HAH HAH
-    //background = new Element(bkgnd, -20, 20, 5, 10, -750, 750, -250, 750, 1, 1, 0, 0, 1, 1);
+    int index = (int)random(modes.length);
+    bMode = modes[index];
 
+    OffsetVelocity velocity = new OffsetVelocity();
+    velocity.min = -20;
+    velocity.max = 20;
+    velocity.stepsMin = 5;
+    velocity.stepsMax = 100;
+
+    OffsetLocation location = new OffsetLocation();
+    location.xmin = -750;
+    location.xmax = 750;
+    location.ymin = -250;
+    location.ymax = 750;
+
+    OffsetSize size = new OffsetSize();
+    size.min = 1;
+    size.max = 1.1;
+    size.velocityMin = 0.01;
+    size.velocityMax = 0.5;
+    size.sizeStepsMin = 1;
+    size.sizeStepsMax = 5;
+
+    backgroundElement = new Element(bkgnd, velocity, location, size);
+    background2 = new Element(b2, velocity, location, size);
 
     dirty = true;
-    return bkgnd;
   }
 
   Element setRandomNancy() {
     PImage nancy = loadImage(getRandomFile(nancys));
     if (nancyElement == null) {
-      //nancyElement = new Element(nancy);
-      //Element(PImage img, int offsetVelocityMin, int offsetVelocityMax, int offsetVelocitySteps,
-      //int xmin, int xmax, int ymin, int ymax,
-      //float sizeMin, float sizeMax, float svMin, float svMax, int sizeStepsMin, int sizeStepsMax)
-      //nancyElement = new Element(nancy, -20, 20, 5, 10, -750, 750, -250, 750, 0.75, 3, -0.02, 0.02, 5, 10);
+
       OffsetVelocity velocity = new OffsetVelocity();
       velocity.min = -20;
       velocity.max = 20;
@@ -85,17 +106,16 @@ class Layers {
   void update() {
     nancyElement.update();
     borderElement.update();
+    //println("pre-update", backgroundElement.locationOffset.x, backgroundElement.locationOffset.y, backgroundElement.currentStep, backgroundElement.steps);
+    backgroundElement.update();
+    //println("post-update", backgroundElement.locationOffset.x, backgroundElement.locationOffset.y, backgroundElement.currentStep, backgroundElement.steps);
+    background2.update();
     dirty = true;
   }
 
   PImage setRandomBorder() {
     borderOverlay = loadImage(getRandomFile(overlays));
 
-    //Element(PImage img, int offsetVelocityMin, int offsetVelocityMax, int offsetVelocitySteps,
-    //int xmin, int xmax, int ymin, int ymax,
-    //float sizeMin, float sizeMax, float svMin, float svMax, int sizeStepsMin, int sizeStepsMax)
-    //nancyElement = new Element(nancy, -20, 20, 5, 10, -750, 750, -250, 750, 0.75, 3, -0.02, 0.02, 5, 10);
-    //borderElement = new Element(borderOverlay, -1, 1, 5, 20, -10, 10, -10, 10, 1.01, 1.02, 0, 0, 1, 1);
     OffsetVelocity velocity = new OffsetVelocity();
     velocity.min = -1;
     velocity.max = 1;
@@ -146,18 +166,21 @@ class Layers {
       (int) (imageSize.height * ratio));
   }
 
+  void drawElement(Element elem) {
+    pg.image(elem.image(), pg.width/2 + elem.locationOffset().x, pg.height/2 + elem.locationOffset().y, pg.width * elem.size(), pg.height * elem.size());
+  }
+
   Layers draw() {
     // we store the rendered layers into a large PGraphics object
     // the sketch then paints that on the visible screen
     pg.beginDraw();
     pg.imageMode(CENTER);
-    pg.image(bkgnd, pg.width/2, pg.height/2, (float)bd.width, (float)bd.height); // needs to be proportional to original
-    pg.image(nancyElement.image(), pg.width/2 + nancyElement.locationOffset().x, pg.height/2 + nancyElement.locationOffset().y, pg.width * nancyElement.size(), pg.height * nancyElement.size());
-
-    //pg.image(borderOverlay, pg.width/2, pg.height/2, pg.width, pg.height);
-    pg.image(borderElement.image(), pg.width/2 + borderElement.locationOffset().x, pg.height/2 + borderElement.locationOffset().y, pg.width * borderElement.size(), pg.height * borderElement.size());
-
-
+    drawElement(backgroundElement);
+    pg.blendMode(bMode);
+    drawElement(background2);
+    pg.blendMode(BLEND);
+    drawElement(nancyElement);
+    drawElement(borderElement);
     pg.endDraw();
     dirty = false;
     return this;

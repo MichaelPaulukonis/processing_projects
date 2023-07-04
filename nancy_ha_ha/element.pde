@@ -22,7 +22,6 @@ class OffsetSize {
 }
 
 class Element {
-  int[] modes = { ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, REPLACE };
   PVector locationOffset;
   PVector offsetVelocity;
   float size;
@@ -31,7 +30,7 @@ class Element {
   float sizeVelocity;
   int steps;
   int currentStep = 0;
-  PImage[] components = new PImage[1];
+  PImage[] components = new PImage[1]; // TODO: this is wrong, they need to be separate elements so they can move independently
 
   int offsetVelocityMin;
   int offsetVelocityMax;
@@ -47,20 +46,12 @@ class Element {
   float svMax;
   int sizeStepsMin;
   int sizeStepsMax;
-  int bMode = BLEND;
 
   Element(PImage img) {
     setLocationOffset();
     setOffsetVelocity();
     setSizeVelocity();
     components[0] = img;
-  }
-
-  Element(PImage[] imgs, OffsetVelocity velocity, OffsetLocation location, OffsetSize size) {
-    this(imgs[0], velocity, location, size);
-    components[1] = imgs[1];
-    int index = (int)random(modes.length);
-    bMode = modes[index];  
   }
 
   Element(PImage img, OffsetVelocity velocity, OffsetLocation location, OffsetSize size) {
@@ -139,13 +130,13 @@ class Element {
   }
 
   PVector updateLocation() {
+    //println("pre-update", locationOffset.x, locationOffset.y, currentStep, steps);
     locationOffset.add(offsetVelocity);
-    println(locationOffset.x, locationOffset.y, currentStep, steps);
     currentStep++;
-    println(locationOffset.x, locationOffset.y, currentStep, steps);
     if (currentStep >= steps) {
       resetOffsetVelocity();
     }
+    //println("post-update", locationOffset.x, locationOffset.y, currentStep, steps);
     return locationOffset;
   }
 
