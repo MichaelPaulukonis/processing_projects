@@ -21,6 +21,7 @@ class Layers {
     setRandomBackground();
     setRandomNancy();
     setRandomBorder();
+    setRandomFloater();
   }
 
   Layers clone() {
@@ -73,6 +74,34 @@ class Layers {
     return nancyElement;
   }
 
+  Element setRandomFloater() {
+    PImage floater = loadImage(getRandomFile(freeComponents));
+
+    OffsetVelocity velocity = new OffsetVelocity();
+    velocity.min = -20;
+    velocity.max = 20;
+    velocity.stepsMin = 5;
+    velocity.stepsMax = 10;
+
+    OffsetLocation location = new OffsetLocation();
+    location.xmin = -1000;
+    location.xmax = 100;
+    location.ymin = -1000;
+    location.ymax = 1000;
+
+    OffsetSize size = new OffsetSize();
+    size.min = 0.5;
+    size.max = 2;
+    size.velocityMin = 0;
+    size.velocityMax = 0.2;
+    size.sizeStepsMin = 1;
+    size.sizeStepsMax = 1;
+
+    freeFloater = new Element(floater, velocity, location, size);
+    dirty = true;
+    return freeFloater;
+  }
+
   Element setRandomNancy() {
     PImage nancy = loadImage(getRandomFile(nancys));
 
@@ -90,7 +119,7 @@ class Layers {
 
     OffsetSize size = new OffsetSize();
     size.min = 1;
-    size.min = 1;
+    size.max = 1;
     size.velocityMin = 0;
     size.velocityMax = 0;
     size.sizeStepsMin = 1;
@@ -107,6 +136,7 @@ class Layers {
   }
 
   void update() {
+    freeFloater.update();
     nancyElement.update();
     borderElement.update();
     backgroundElement.update();
@@ -182,6 +212,7 @@ class Layers {
     pg.blendMode(bMode);
     drawElement(background2);
     pg.blendMode(BLEND);
+    drawElement(freeFloater);
     drawElement(nancyElement);
     drawElement(borderElement);
     pg.endDraw();

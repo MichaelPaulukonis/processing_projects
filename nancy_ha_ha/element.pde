@@ -95,6 +95,9 @@ class Element {
     sizeVelocity = random(svMin, svMax);
   }
 
+  // hunh, do I even need this?
+  // not if we're using min/max - it's just how long it takes
+  // which will simplify things nice
   void setSizeSteps(int stepsMin, int stepsMax) {
     sizeSteps = (int)random(stepsMin, stepsMax);
   }

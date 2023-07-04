@@ -7,11 +7,12 @@ int canvasWidth = 2000;
 int canvasHeight = canvasWidth;
 Layers layers;
 boolean shiftIsPressed = false;
+boolean alwaysSave = false;
 
 String root = "/Users/michaelpaulukonis//projects/processing_projects_orig/nancy_ha_ha/";
 String componentPath = "input/components";
 String nancyComponentPath = "input/components.nancy";
-String overlayPath = "input/overlays";
+String overlayPath = "input/overlays"; // border overlays
 String backgroundPath = "input/backgrounds";
 
 
@@ -29,7 +30,7 @@ public static String[] getFiles(String folderpath) {
 String[] backgrounds = getFiles(root + backgroundPath);
 String[] nancys = getFiles(root + nancyComponentPath);
 String[] overlays = getFiles(root + overlayPath);
-String[] components = getFiles(root + componentPath);
+String[] freeComponents = getFiles(root + componentPath);
 
 String getRandomFile(String[] files) {
   int index = int(random(files.length));
@@ -49,6 +50,13 @@ void setup() {
 void draw() {
   layers.update();
   image(layers.rendered(), width/2, height/2, width, height);
+  if (alwaysSave) saveFrame();
+}
+
+void saveFrame() {
+  String fname = "output/nancy." + timestamp() + ".tga";
+  layers.rendered().save(fname);
+  println("Saved as: " + fname);
 }
 
 void keyPressed() {
@@ -77,10 +85,11 @@ void keyPressed() {
     layers.setRandomNancy();
   } else if (key == 'o' || key == 'O') {
     layers.setRandomBorder();
-  } else if (key == 's' || key == 'S') {
-    String fname = "output/nancy." + timestamp() + ".tga";
-    layers.rendered().save(fname);
-    println("Saved as: " + fname);
+  } else if (key == 's') {
+    saveFrame();
+  } else if (key == 'S') {
+    alwaysSave = !alwaysSave;
+    if (alwaysSave) saveFrame();
   }
 }
 
