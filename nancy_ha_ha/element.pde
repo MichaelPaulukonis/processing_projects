@@ -30,7 +30,7 @@ class Element {
   float sizeVelocity;
   int steps;
   int currentStep = 0;
-  PImage[] components = new PImage[1]; // TODO: this is wrong, they need to be separate elements so they can move independently
+  PImage img;
 
   int offsetVelocityMin;
   int offsetVelocityMax;
@@ -47,18 +47,18 @@ class Element {
   int sizeStepsMin;
   int sizeStepsMax;
 
-  Element(PImage img) {
+  Element(PImage i) {
     setLocationOffset();
     setOffsetVelocity();
     setSizeVelocity();
-    components[0] = img;
+    img = i;
   }
 
-  Element(PImage img, OffsetVelocity velocity, OffsetLocation location, OffsetSize size) {
+  Element(PImage i, OffsetVelocity velocity, OffsetLocation location, OffsetSize size) {
     setOffsetVelocity(velocity.min, velocity.max, velocity.stepsMin, velocity.stepsMax);
     setLocationOffset(location.xmin, location.xmax, location.ymin, location.ymax);
     setSizeVelocity(size.min, size.max, size.velocityMin, size.velocityMax, size.sizeStepsMin, size.sizeStepsMax);
-    components[0] = img;
+    img = i;
   }
 
   // values in here are pretty much for the nancy element
@@ -85,7 +85,6 @@ class Element {
   }
 
   void resetOffsetVelocity() {
-    println("resetOffsetVelocity");
     offsetVelocity = new PVector(random(this.offsetVelocityMin, this.offsetVelocityMax), random(this.offsetVelocityMin, this.offsetVelocityMax));
     steps = (int)random(this.offsetVelocityStepsMin, this.offsetVelocityStepsMax);
     currentStep = 0;
@@ -134,7 +133,7 @@ class Element {
     if (size >= this.sizeMax || size <= this.sizeMin ) {
       sizeVelocity = -sizeVelocity;
     }
-    size = max(min(size, this.sizeMax), this.sizeMin);
+    size = constrain(size, this.sizeMin, this.sizeMax);
     currentSizeStep++;
     if (currentSizeStep >= sizeSteps) {
       resetSizeVelocity();
@@ -167,12 +166,51 @@ class Element {
     return size;
   }
 
-  Element setImage(PImage img) {
-    components[0] = img;
+  Element setImage(PImage i) {
+    img = i;
     return this;
   }
 
   PImage image() {
-    return components[0];
+    return img;
+  }
+}
+
+class ElementBounded extends Element {
+
+  PGraphics pg; // overkill - just need size
+  Dimension d;
+  
+  ElementBounded(PImage i, OffsetVelocity velocity, OffsetLocation location, OffsetSize size, PGraphics pg, Dimension b) {
+    super(i, velocity, location, size);
+    this.pg = pg;
+    this.d = b;
+  }
+
+  @Override
+    PVector updateLocation() {
+    //println("pre-update", locationOffset.x, locationOffset.y, currentStep, steps);
+    locationOffset.add(offsetVelocity);
+    currentStep++;
+    if (currentStep >= steps) {
+      resetOffsetVelocity();
+    }
+
+    // xmin >= (pg.width / 2) - ((bd.width * size) / 2)
+    // xmax <= pg.width - (pg.width / 2) + ((bd.width * size) / 2)
+    // (pg.height / 2) - ((bd.height * size) / 2) - ymin <= 0
+    // (pg.height / 2) - ((bd.height * 2) / 1) + ymax >= pg.height
+
+    //pg.image(elem.image(), pg.width/2 + elem.locationOffset().x, pg.height/2 + elem.locationOffset().y,
+    //  d.width * elem.size(), d.height * elem.size());
+
+    // if this is a bounded element, check for boundary violations (lack of coverage)
+
+    float right = pg.width/2 - locationOffset.x + img.width;
+    float left = pg.width/2 - locationOffset.x;
+    println(left, right);
+
+    //println("post-update", locationOffset.x, locationOffset.y, currentStep, steps);
+    return locationOffset;
   }
 }

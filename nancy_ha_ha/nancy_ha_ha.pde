@@ -60,8 +60,6 @@ void saveFrame() {
 }
 
 void keyPressed() {
-  println(keyCode);
-
   if (key==CODED) {
     if (keyCode == SHIFT) shiftIsPressed = true;
     else  if (keyCode == 39 || keyCode == 37) {
