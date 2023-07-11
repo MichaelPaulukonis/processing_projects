@@ -189,11 +189,9 @@ class ElementBounded extends Element {
     double heightRatio = boundary.getHeight() / imageSize.getHeight();
     double r = Math.max(widthRatio, heightRatio);
 
-    // sizeMin/sizeMax are based on original image size
-    // rather, they should be based on the RATIO (or should they?)
-    float mod = Math.min((float)(r * random(1, 5)), this.sizeMax);
+    double mod = Math.min((r * random(1, 5)), this.sizeMax * r);
     println("ratio: ", r, "mod: ", mod);
-    return mod;
+    return (float)mod;
   }
 
   ElementBounded(PImage i, OffsetVelocity velocity, OffsetLocation location, OffsetSize size, PGraphics pg) {
@@ -202,16 +200,6 @@ class ElementBounded extends Element {
     this.ratio = getScale(new Dimension(i.width, i.height), new Dimension(pg.width, pg.height));
     println(this.ratio);
   }
-
-
-  //// xmin should never be less than pg.width/2
-  // this is an options collection to simplify signatures
-  //class OffsetLocation {
-  //  int xmin;
-  //  int xmax;
-  //  int ymin;
-  //  int ymax;
-  //}
 
   @Override
     PVector updateLocation() {

@@ -47,8 +47,8 @@ class Layers {
     velocity.stepsMax = 100;
 
     OffsetSize size = new OffsetSize();
-    size.min = 1.5;
-    size.max = 3;
+    size.min = 1.1;
+    size.max = 2;
     size.velocityMin = 0.001;
     size.velocityMax = 0.01;
     size.sizeStepsMin = 5;
@@ -57,10 +57,10 @@ class Layers {
     // this should be a function of image-dimensions and size and background dimensions (bd,b2d)
     // if offset + size means part of screen is uncovered, things have to change
     OffsetLocation location = new OffsetLocation();  // from center of canvas (pg)
-    location.xmin = -100; // (pg.width / 2) - ((bd.width * size) / 2) - xmin <= 0
-    location.xmax = 100;  // (pg.width / 2) - ((bd.width * size) / 2) + xmax >= pg.width
-    location.ymin = -250; // (pg.height / 2) - ((bd.height * size) / 2) - ymin <= 0
-    location.ymax = 250; // (pg.height / 2) - ((bd.height * 2) / 1) + ymax >= pg.height
+    location.xmin = -100; 
+    location.xmax = 100; 
+    location.ymin = -250;
+    location.ymax = 250;
 
     backgroundElement = new ElementBounded(bkgnd, velocity, location, size, pg);
     background2 = new ElementBounded(b2, velocity, location, size, pg);
@@ -149,8 +149,8 @@ class Layers {
     OffsetSize size = new OffsetSize();
     //size.min = 1.0; // this should be relative to the target size, not to the original
     //size.max = 1.02;
-    size.min = 0.5;
-    size.max = 0.503;
+    size.min = 1.0;
+    size.max = 1.02;
     size.velocityMin = 0;
     size.velocityMax = 0;
     size.sizeStepsMin = 1;
