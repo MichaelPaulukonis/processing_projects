@@ -8,7 +8,7 @@ class Layers {
   Element nancyElement;
   ElementBounded backgroundElement;
   ElementBounded background2;
-  Element borderElement;
+  ElementBounded borderElement;
   Element freeFloater;
 
   int bMode = BLEND;
@@ -20,7 +20,7 @@ class Layers {
 
     setRandomBackground();
     setRandomNancy();
-    setRandomBorder();
+    setRandomBorder(); // also called overlay (needs to be consolidated)
     setRandomFloater();
   }
 
@@ -57,18 +57,13 @@ class Layers {
     // this should be a function of image-dimensions and size and background dimensions (bd,b2d)
     // if offset + size means part of screen is uncovered, things have to change
     OffsetLocation location = new OffsetLocation();  // from center of canvas (pg)
-    location.xmin = -750; // (pg.width / 2) - ((bd.width * size) / 2) - xmin <= 0
-    location.xmax = 750;  // (pg.width / 2) - ((bd.width * size) / 2) + xmax >= pg.width
+    location.xmin = -100; // (pg.width / 2) - ((bd.width * size) / 2) - xmin <= 0
+    location.xmax = 100;  // (pg.width / 2) - ((bd.width * size) / 2) + xmax >= pg.width
     location.ymin = -250; // (pg.height / 2) - ((bd.height * size) / 2) - ymin <= 0
-    location.ymax = 750; // (pg.height / 2) - ((bd.height * 2) / 1) + ymax >= pg.height
+    location.ymax = 250; // (pg.height / 2) - ((bd.height * 2) / 1) + ymax >= pg.height
 
-    // xmin >= (pg.width / 2) - ((bd.width * size) / 2)
-    // xmax <= pg.width - (pg.width / 2) + ((bd.width * size) / 2)
-    // (pg.height / 2) - ((bd.height * size) / 2) - ymin <= 0
-    // (pg.height / 2) - ((bd.height * 2) / 1) + ymax >= pg.height
-
-    backgroundElement = new ElementBounded(bkgnd, velocity, location, size, pg, bd);
-    background2 = new ElementBounded(b2, velocity, location, size, pg, b2d);
+    backgroundElement = new ElementBounded(bkgnd, velocity, location, size, pg);
+    background2 = new ElementBounded(b2, velocity, location, size, pg);
 
     dirty = true;
   }
@@ -152,14 +147,16 @@ class Layers {
     location.ymax = 10;
 
     OffsetSize size = new OffsetSize();
-    size.min = 1.01;
-    size.max = 1.02;
+    //size.min = 1.0; // this should be relative to the target size, not to the original
+    //size.max = 1.02;
+    size.min = 0.5;
+    size.max = 0.503;
     size.velocityMin = 0;
     size.velocityMax = 0;
     size.sizeStepsMin = 1;
     size.sizeStepsMax = 1;
 
-    borderElement = new Element(borderOverlay, velocity, location, size);
+    borderElement = new ElementBounded(borderOverlay, velocity, location, size, pg);
 
     dirty = true;
     return borderOverlay;
@@ -198,41 +195,40 @@ class Layers {
 
     double widthRatio = boundary.getWidth() / imageSize.getWidth();
     double heightRatio = boundary.getHeight() / imageSize.getHeight();
-    double ratio = Math.max(widthRatio, heightRatio);
+    double rt = Math.max(widthRatio, heightRatio);
 
-    return new Dimension((int) (imageSize.width  * ratio),
-      (int) (imageSize.height * ratio));
+    return new Dimension((int) (imageSize.width  * rt),
+      (int) (imageSize.height * rt));
   }
 
   void drawElement(Element elem) {
-    pg.image(elem.image(), pg.width/2 + elem.locationOffset().x, pg.height/2 + elem.locationOffset().y,
+    pg.image(elem.image(), elem.locationOffset().x, elem.locationOffset().y,
       pg.width * elem.size(), pg.height * elem.size());
   }
 
-  // the 
   void drawElement(Element elem, Dimension d) {
-    pg.image(elem.image(), pg.width/2 + elem.locationOffset().x, pg.height/2 + elem.locationOffset().y,
+    pg.image(elem.image(), elem.locationOffset().x, elem.locationOffset().y,
       d.width * elem.size(), d.height * elem.size());
   }
-  
-  void drawElement(ElementBounded elem) {
-    pg.image(elem.image(), pg.width/2 + elem.locationOffset().x, pg.height/2 + elem.locationOffset().y,
-      elem.d.width * elem.size(), elem.d.height * elem.size());
-  }
 
+  void drawElement2(ElementBounded elem) {
+    pg.image(elem.image(), 0 - elem.locationOffset().x, 0 - elem.locationOffset().y,
+      elem.ratio * elem.image().width, elem.ratio * elem.image().height);
+  }
 
   Layers draw() {
     // we store the rendered layers into a large PGraphics object
     // the sketch then paints that on the visible screen
     pg.beginDraw();
-    pg.imageMode(CENTER);
-    drawElement(backgroundElement);
+    pg.imageMode(CORNER);
+    drawElement2(backgroundElement);
     pg.blendMode(bMode);
-    drawElement(background2);
+    drawElement2(background2);
     pg.blendMode(BLEND);
     drawElement(freeFloater);
     drawElement(nancyElement);
-    drawElement(borderElement);
+    println("border ratio: ", borderElement.ratio, borderElement.image().width, borderElement.locationOffset().x);
+    drawElement2(borderElement);
     pg.endDraw();
     dirty = false;
     return this;

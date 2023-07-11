@@ -5,6 +5,7 @@ class OffsetVelocity {
   int stepsMax;
 }
 
+// xmin should never be less than pg.width/2
 class OffsetLocation {
   int xmin;
   int xmax;
@@ -180,37 +181,55 @@ class ElementBounded extends Element {
 
   PGraphics pg; // overkill - just need size
   Dimension d;
-  
-  ElementBounded(PImage i, OffsetVelocity velocity, OffsetLocation location, OffsetSize size, PGraphics pg, Dimension b) {
+  float ratio;
+
+  float getScale(Dimension imageSize, Dimension boundary) {
+
+    double widthRatio = boundary.getWidth() / imageSize.getWidth();
+    double heightRatio = boundary.getHeight() / imageSize.getHeight();
+    double r = Math.max(widthRatio, heightRatio);
+
+    // sizeMin/sizeMax are based on original image size
+    // rather, they should be based on the RATIO (or should they?)
+    float mod = Math.min((float)(r * random(1, 5)), this.sizeMax);
+    println("ratio: ", r, "mod: ", mod);
+    return mod;
+  }
+
+  ElementBounded(PImage i, OffsetVelocity velocity, OffsetLocation location, OffsetSize size, PGraphics pg) {
     super(i, velocity, location, size);
     this.pg = pg;
-    this.d = b;
+    this.ratio = getScale(new Dimension(i.width, i.height), new Dimension(pg.width, pg.height));
+    println(this.ratio);
   }
+
+
+  //// xmin should never be less than pg.width/2
+  // this is an options collection to simplify signatures
+  //class OffsetLocation {
+  //  int xmin;
+  //  int xmax;
+  //  int ymin;
+  //  int ymax;
+  //}
 
   @Override
     PVector updateLocation() {
-    //println("pre-update", locationOffset.x, locationOffset.y, currentStep, steps);
+    // locationOffset is a vector
+    // it should prolly be an object that only exposes the location
+    // but auto-constrains itself
     locationOffset.add(offsetVelocity);
     currentStep++;
     if (currentStep >= steps) {
       resetOffsetVelocity();
     }
 
-    // xmin >= (pg.width / 2) - ((bd.width * size) / 2)
-    // xmax <= pg.width - (pg.width / 2) + ((bd.width * size) / 2)
-    // (pg.height / 2) - ((bd.height * size) / 2) - ymin <= 0
-    // (pg.height / 2) - ((bd.height * 2) / 1) + ymax >= pg.height
+    float offsetX = constrain(locationOffset.x, 0, img.width * ratio - pg.width);
+    float offsetY = constrain(locationOffset.y, 0, img.height * ratio - pg.height);
 
-    //pg.image(elem.image(), pg.width/2 + elem.locationOffset().x, pg.height/2 + elem.locationOffset().y,
-    //  d.width * elem.size(), d.height * elem.size());
+    locationOffset.x = offsetX;
+    locationOffset.y = offsetY;
 
-    // if this is a bounded element, check for boundary violations (lack of coverage)
-
-    float right = pg.width/2 - locationOffset.x + img.width;
-    float left = pg.width/2 - locationOffset.x;
-    println(left, right);
-
-    //println("post-update", locationOffset.x, locationOffset.y, currentStep, steps);
     return locationOffset;
   }
 }
