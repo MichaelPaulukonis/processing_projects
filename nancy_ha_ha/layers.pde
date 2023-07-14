@@ -2,8 +2,6 @@ class Layers {
   PImage borderOverlay;
   PImage[] components;
   PGraphics pg;
-  Dimension bd;
-  Dimension b2d;
   Boolean dirty = true;
   Element nancyElement;
   ElementBounded backgroundElement;
@@ -11,10 +9,6 @@ class Layers {
   ElementBounded borderElement;
   Element freeFloater;
   Fader backgroundFader;
-
-  int bMode = BLEND;
-
-  int[] modes = { ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, REPLACE };
 
   Layers() {
     pg = createGraphics(2000, 2000);  // variable-ize
@@ -35,11 +29,6 @@ class Layers {
   void setRandomBackground() {
     PImage bkgnd = loadImage(getRandomFile(backgrounds));
     PImage b2 = loadImage(getRandomFile(backgrounds));
-    bd = getScaledDimension(new Dimension(bkgnd.width, bkgnd.height), new Dimension(pg.width, pg.height));
-    b2d = getScaledDimension(new Dimension(b2.width, b2.height), new Dimension(pg.width, pg.height));
-
-    int index = (int)random(modes.length);
-    bMode = modes[index];
 
     OffsetVelocity velocity = new OffsetVelocity(); // straight-up added to offsetLocation
     velocity.min = -10;
@@ -55,9 +44,7 @@ class Layers {
     size.sizeStepsMin = 5;
     size.sizeStepsMax = 20;
 
-    // this should be a function of image-dimensions and size and background dimensions (bd,b2d)
-    // if offset + size means part of screen is uncovered, things have to change
-    OffsetLocation location = new OffsetLocation();  // from center of canvas (pg)
+    OffsetLocation location = new OffsetLocation();
     location.xmin = -100; 
     location.xmax = 100; 
     location.ymin = -250;
@@ -66,7 +53,7 @@ class Layers {
     backgroundElement = new ElementBounded(bkgnd, velocity, location, size, pg);
     background2 = new ElementBounded(b2, velocity, location, size, pg);
 
-    backgroundFader = new Fader(backgroundElement, background2, 10);
+    backgroundFader = new Fader(backgroundElement, background2, 20);
 
     dirty = true;
   }
@@ -87,7 +74,7 @@ class Layers {
     location.ymax = 1000;
 
     OffsetSize size = new OffsetSize();
-    size.min = 0.5;  // but this is multiplied by image original size
+    size.min = 0.5;
     size.max = 2;
     size.velocityMin = -0.02;
     size.velocityMax = 0.02; // added to size, not multiplied
@@ -208,11 +195,6 @@ class Layers {
       pg.width * elem.size(), pg.height * elem.size());
   }
 
-  //void drawElement(Element elem, Dimension d) {
-  //  pg.image(elem.image(), elem.locationOffset().x, elem.locationOffset().y,
-  //    d.width * elem.size(), d.height * elem.size());
-  //}
-
   // make this part of the fader
   // heck, it might be part of each element, come to think of it
   // in which case.....
@@ -229,9 +211,6 @@ class Layers {
     pg.background(255);
     pg.imageMode(CORNER);
     pg.image(backgroundFader.render(), 0, 0);
-    //drawElement2(backgroundElement);
-    //pg.blendMode(bMode);
-    //drawElement2(background2);
     pg.blendMode(BLEND);
     drawElement(freeFloater);
     drawElement(nancyElement);
