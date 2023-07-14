@@ -10,13 +10,14 @@ class Layers {
   ElementBounded background2;
   ElementBounded borderElement;
   Element freeFloater;
+  Fader backgroundFader;
 
   int bMode = BLEND;
 
   int[] modes = { ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, REPLACE };
 
   Layers() {
-    pg = createGraphics(2000, 2000);
+    pg = createGraphics(2000, 2000);  // variable-ize
 
     setRandomBackground();
     setRandomNancy();
@@ -64,6 +65,8 @@ class Layers {
 
     backgroundElement = new ElementBounded(bkgnd, velocity, location, size, pg);
     background2 = new ElementBounded(b2, velocity, location, size, pg);
+
+    backgroundFader = new Fader(backgroundElement, background2, 10);
 
     dirty = true;
   }
@@ -147,8 +150,6 @@ class Layers {
     location.ymax = 10;
 
     OffsetSize size = new OffsetSize();
-    //size.min = 1.0; // this should be relative to the target size, not to the original
-    //size.max = 1.02;
     size.min = 1.0;
     size.max = 1.02;
     size.velocityMin = 0;
@@ -171,8 +172,9 @@ class Layers {
     freeFloater.update();
     nancyElement.update();
     borderElement.update();
-    backgroundElement.update();
-    background2.update();
+    //backgroundElement.update();
+    //background2.update();
+    backgroundFader.update();
     dirty = true;
   }
 
@@ -206,11 +208,14 @@ class Layers {
       pg.width * elem.size(), pg.height * elem.size());
   }
 
-  void drawElement(Element elem, Dimension d) {
-    pg.image(elem.image(), elem.locationOffset().x, elem.locationOffset().y,
-      d.width * elem.size(), d.height * elem.size());
-  }
+  //void drawElement(Element elem, Dimension d) {
+  //  pg.image(elem.image(), elem.locationOffset().x, elem.locationOffset().y,
+  //    d.width * elem.size(), d.height * elem.size());
+  //}
 
+  // make this part of the fader
+  // heck, it might be part of each element, come to think of it
+  // in which case.....
   void drawElement2(ElementBounded elem) {
     pg.image(elem.image(), 0 - elem.locationOffset().x, 0 - elem.locationOffset().y,
       elem.ratio * elem.image().width, elem.ratio * elem.image().height);
@@ -220,14 +225,16 @@ class Layers {
     // we store the rendered layers into a large PGraphics object
     // the sketch then paints that on the visible screen
     pg.beginDraw();
+    pg.clear();
+    pg.background(255);
     pg.imageMode(CORNER);
-    drawElement2(backgroundElement);
-    pg.blendMode(bMode);
-    drawElement2(background2);
+    pg.image(backgroundFader.render(), 0, 0);
+    //drawElement2(backgroundElement);
+    //pg.blendMode(bMode);
+    //drawElement2(background2);
     pg.blendMode(BLEND);
     drawElement(freeFloater);
     drawElement(nancyElement);
-    println("border ratio: ", borderElement.ratio, borderElement.image().width, borderElement.locationOffset().x);
     drawElement2(borderElement);
     pg.endDraw();
     dirty = false;

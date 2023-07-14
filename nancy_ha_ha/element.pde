@@ -32,6 +32,7 @@ class Element {
   int steps;
   int currentStep = 0;
   PImage img;
+  PGraphics temp;
 
   int offsetVelocityMin;
   int offsetVelocityMax;
@@ -60,6 +61,7 @@ class Element {
     setLocationOffset(location.xmin, location.xmax, location.ymin, location.ymax);
     setSizeVelocity(size.min, size.max, size.velocityMin, size.velocityMax, size.sizeStepsMin, size.sizeStepsMax);
     img = i;
+    temp = createGraphics(2000, 2000);
   }
 
   // values in here are pretty much for the nancy element
@@ -119,14 +121,16 @@ class Element {
     resetSizeVelocity();
   }
 
-  void resetSizeVelocity() {
+  Element resetSizeVelocity() {
     setSizeVelocity(this.svMin, this.svMax);
     setSizeSteps(this.sizeStepsMin, this.sizeStepsMax);
     currentSizeStep = 0;
+    return this;
   }
 
-  void setRandomSize(float min, float max) {
+  Element setRandomSize(float min, float max) {
     this.size = random(min, max);
+    return this;
   }
 
   Element updateSize() {
@@ -142,15 +146,13 @@ class Element {
     return this;
   }
 
-  PVector updateLocation() {
-    //println("pre-update", locationOffset.x, locationOffset.y, currentStep, steps);
+  Element updateLocation() {
     locationOffset.add(offsetVelocity);
     currentStep++;
     if (currentStep >= steps) {
       resetOffsetVelocity();
     }
-    //println("post-update", locationOffset.x, locationOffset.y, currentStep, steps);
-    return locationOffset;
+    return this;
   }
 
   Element update() {
@@ -175,6 +177,14 @@ class Element {
   PImage image() {
     return img;
   }
+
+  PGraphics render() {
+    temp.beginDraw();
+    temp.clear();
+    temp.image(img, locationOffset.x, locationOffset.y,
+      2000 * size(), 2000 * size());
+    return temp;
+  }
 }
 
 class ElementBounded extends Element {
@@ -190,7 +200,7 @@ class ElementBounded extends Element {
     double r = Math.max(widthRatio, heightRatio);
 
     double mod = Math.min((r * random(1, 5)), this.sizeMax * r);
-    println("ratio: ", r, "mod: ", mod);
+    //println("ratio: ", r, "mod: ", mod);
     return (float)mod;
   }
 
@@ -202,7 +212,7 @@ class ElementBounded extends Element {
   }
 
   @Override
-    PVector updateLocation() {
+    ElementBounded updateLocation() {
     // locationOffset is a vector
     // it should prolly be an object that only exposes the location
     // but auto-constrains itself
@@ -218,6 +228,25 @@ class ElementBounded extends Element {
     locationOffset.x = offsetX;
     locationOffset.y = offsetY;
 
-    return locationOffset;
+    return this;
+  }
+
+  @Override
+    ElementBounded setImage(PImage i) {
+    this.img = i;
+    this.ratio = getScale(new Dimension(i.width, i.height), new Dimension(pg.width, pg.height));
+    println(this.ratio);
+    return this;
+  }
+
+  @Override
+    PGraphics render() {
+    temp.beginDraw();
+    temp.clear();
+    temp.background(255);
+    temp.image(this.img, 0 - locationOffset.x, 0 - locationOffset.y,
+      ratio * img.width, ratio * img.height);
+    temp.endDraw();
+    return temp;
   }
 }
