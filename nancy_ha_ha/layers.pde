@@ -4,8 +4,6 @@ class Layers {
   PGraphics pg;
   Boolean dirty = true;
   Element nancyElement;
-  ElementBounded backgroundElement;
-  ElementBounded background2;
   ElementBounded borderElement;
   Element freeFloater;
   Fader backgroundFader;
@@ -50,8 +48,8 @@ class Layers {
     location.ymin = -250;
     location.ymax = 250;
 
-    backgroundElement = new ElementBounded(bkgnd, velocity, location, size, pg);
-    background2 = new ElementBounded(b2, velocity, location, size, pg);
+    ElementBounded backgroundElement = new ElementBounded(bkgnd, velocity, location, size, pg);
+    ElementBounded background2 = new ElementBounded(b2, velocity, location, size, pg);
 
     backgroundFader = new Fader(backgroundElement, background2, 20);
 
@@ -159,8 +157,6 @@ class Layers {
     freeFloater.update();
     nancyElement.update();
     borderElement.update();
-    //backgroundElement.update();
-    //background2.update();
     backgroundFader.update();
     dirty = true;
   }
@@ -178,8 +174,6 @@ class Layers {
     return pg;
   }
 
-  // background needs this, but something that doesn't change size does not
-  // aaaaaaand, we're not taking into consideration image movement or resizing.....
   Dimension getScaledDimension(Dimension imageSize, Dimension boundary) {
 
     double widthRatio = boundary.getWidth() / imageSize.getWidth();

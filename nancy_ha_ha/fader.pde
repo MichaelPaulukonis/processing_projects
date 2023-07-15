@@ -3,22 +3,20 @@ class Fader {
   ElementBounded top;
   ElementBounded bottom;
   int fadeSteps;
+  int sessionSteps;
   int currentStep = 0;
   PGraphics renderer;
-
   int bMode = BLEND;
 
   int[] modes = { BLEND, BLEND, BLEND, ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, REPLACE };
 
-  // TODO: randomize the fade steps a bit - wobble around passed-in number
-  // each time reset, wobble it again (from the original)
-  // +/- 50% difference?
   Fader (ElementBounded t, ElementBounded b, int fadeSteps) {
     this.top = t;
     this.bottom = b;
     this.fadeSteps = fadeSteps;
     this.renderer = createGraphics(2000, 2000);
     randomBlendMode();
+    this.sessionSteps = randomizedSteps();
   }
 
   Fader randomBlendMode() {
@@ -27,29 +25,34 @@ class Fader {
     return this;
   }
 
+  int randomizedSteps() {
+    int direction = random(1) > 0.5 ? 1 : -1;
+    int offset = (int)random(this.fadeSteps / 2);
+    return this.fadeSteps + (direction * offset);
+  }
+
   Fader update() {
     this.top.update();
     this.bottom.update();
     this.currentStep++;
 
-    if (this.currentStep >= fadeSteps) {
+    if (this.currentStep >= this.sessionSteps) {
       PImage bkgnd = loadImage(getRandomFile(backgrounds));
       this.top.setImage(bkgnd);
       ElementBounded temp = this.bottom;
       this.bottom = this.top;
       this.top = temp;
       this.currentStep = 0;
-      // only change mode n% of the time .... 1/3 times?
-      // maybe disconnect from fade? but that will be a more abrupt change
-      // which isn't a bad thing
-      randomBlendMode();
+      this.sessionSteps = randomizedSteps();
+      if (random(3) > 2) {
+        randomBlendMode();
+      }
     }
     return this;
   }
 
   float getFade() {
-    float fadeAmount = map(this.currentStep, 0, this.fadeSteps, 255, 0);
-    println("fade step: ", this.currentStep, " fade amonunt: ", fadeAmount);
+    float fadeAmount = map(this.currentStep, 0, this.sessionSteps, 255, 0);
     return fadeAmount;
   }
 
