@@ -54,7 +54,7 @@ void draw() {
 }
 
 void saveFrame() {
-  String fname = "output/nancy." + timestamp() + ".tga";
+  String fname = "output/nancy." + timestamp() + "." + frameCount + ".tga";
   layers.rendered().save(fname);
   println("Saved as: " + fname);
 }

@@ -7,16 +7,20 @@ class Fader {
   int currentStep = 0;
   PGraphics renderer;
   int bMode = BLEND;
+  final int FADE = 1000;
+  String[] imagePaths;
 
-  int[] modes = { BLEND, BLEND, BLEND, ADD, SUBTRACT, DARKEST, LIGHTEST, DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, REPLACE };
+  int[] modes = { BLEND, BLEND, BLEND, ADD, SUBTRACT, DARKEST, LIGHTEST,
+    DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, REPLACE, FADE };
 
-  Fader (ElementBounded t, ElementBounded b, int fadeSteps) {
+  Fader (ElementBounded t, ElementBounded b, int fadeSteps, String[] images) {
     this.top = t;
     this.bottom = b;
     this.fadeSteps = fadeSteps;
     this.renderer = createGraphics(2000, 2000);
     randomBlendMode();
     this.sessionSteps = randomizedSteps();
+    this.imagePaths = images;
   }
 
   Fader randomBlendMode() {
@@ -37,7 +41,7 @@ class Fader {
     this.currentStep++;
 
     if (this.currentStep >= this.sessionSteps) {
-      PImage bkgnd = loadImage(getRandomFile(backgrounds));
+      PImage bkgnd = loadImage(getRandomFile(this.imagePaths));
       this.top.setImage(bkgnd);
       ElementBounded temp = this.bottom;
       this.bottom = this.top;
@@ -56,15 +60,23 @@ class Fader {
     return fadeAmount;
   }
 
+  PGraphics setMode(PGraphics r) {
+    if (bMode == FADE) {
+      r.tint(255, getFade());
+    } else {
+      r.blendMode(bMode);
+    }
+    return r;
+  }
+
   PGraphics render() {
     renderer.beginDraw();
     renderer.imageMode(CORNER);
     renderer.blendMode(BLEND);
     renderer.clear();
     renderer.image(bottom.render(), 0, 0);
-    renderer.tint(255, getFade());
-    renderer.blendMode(bMode);
-    renderer.image(top.render(), 0, 0);
+    setMode(renderer)
+      .image(top.render(), 0, 0);
     renderer.endDraw();
     return renderer;
   }

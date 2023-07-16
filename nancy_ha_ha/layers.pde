@@ -48,10 +48,10 @@ class Layers {
     location.ymin = -250;
     location.ymax = 250;
 
-    ElementBounded backgroundElement = new ElementBounded(bkgnd, velocity, location, size, pg);
-    ElementBounded background2 = new ElementBounded(b2, velocity, location, size, pg);
+    ElementBounded backgroundElement = new ElementBounded(bkgnd, velocity, location, size, pg, backgrounds);
+    ElementBounded background2 = new ElementBounded(b2, velocity, location, size, pg, backgrounds);
 
-    backgroundFader = new Fader(backgroundElement, background2, 20);
+    backgroundFader = new Fader(backgroundElement, background2, 20, backgrounds);
 
     dirty = true;
   }
@@ -79,7 +79,7 @@ class Layers {
     size.sizeStepsMin = 1;
     size.sizeStepsMax = 1;
 
-    freeFloater = new Element(floater, velocity, location, size);
+    freeFloater = new Element(floater, velocity, location, size, freeComponents);
     dirty = true;
     return freeFloater;
   }
@@ -107,7 +107,7 @@ class Layers {
     size.sizeStepsMin = 1;
     size.sizeStepsMax = 1;
 
-    nancyElement = new Element(nancy, velocity, location, size);
+    nancyElement = new Element(nancy, velocity, location, size, nancys);
     dirty = true;
     return nancyElement;
   }
@@ -142,7 +142,7 @@ class Layers {
     size.sizeStepsMin = 1;
     size.sizeStepsMax = 1;
 
-    borderElement = new ElementBounded(borderOverlay, velocity, location, size, pg);
+    borderElement = new ElementBounded(borderOverlay, velocity, location, size, pg, overlays);
 
     dirty = true;
     return borderOverlay;

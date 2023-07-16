@@ -48,18 +48,13 @@ class Element {
   float svMax;
   int sizeStepsMin;
   int sizeStepsMax;
+  String[] imagePaths;
 
-  Element(PImage i) {
-    setLocationOffset();
-    setOffsetVelocity();
-    setSizeVelocity();
-    img = i;
-  }
-
-  Element(PImage i, OffsetVelocity velocity, OffsetLocation location, OffsetSize size) {
+  Element(PImage i, OffsetVelocity velocity, OffsetLocation location, OffsetSize size, String[] images) {
     setOffsetVelocity(velocity.min, velocity.max, velocity.stepsMin, velocity.stepsMax);
     setLocationOffset(location.xmin, location.xmax, location.ymin, location.ymax);
     setSizeVelocity(size.min, size.max, size.velocityMin, size.velocityMax, size.sizeStepsMin, size.sizeStepsMax);
+    this.imagePaths = images;
     img = i;
     temp = createGraphics(2000, 2000);
   }
@@ -133,6 +128,7 @@ class Element {
     return this;
   }
 
+
   Element updateSize() {
     size += sizeVelocity;
     if (size >= this.sizeMax || size <= this.sizeMin ) {
@@ -158,6 +154,10 @@ class Element {
   Element update() {
     updateSize();
     updateLocation();
+    // TODO: better control of this
+    if (random(0, 1) < 0.1) {
+      this.randomImage();
+    }
     return this;
   }
 
@@ -169,8 +169,13 @@ class Element {
     return size;
   }
 
+  Element randomImage() {
+    this.img = loadImage(getRandomFile(this.imagePaths));
+    return this;
+  }
+
   Element setImage(PImage i) {
-    img = i;
+    this.img = i;
     return this;
   }
 
@@ -204,11 +209,10 @@ class ElementBounded extends Element {
     return (float)mod;
   }
 
-  ElementBounded(PImage i, OffsetVelocity velocity, OffsetLocation location, OffsetSize size, PGraphics pg) {
-    super(i, velocity, location, size);
+  ElementBounded(PImage i, OffsetVelocity velocity, OffsetLocation location, OffsetSize size, PGraphics pg, String[] imagePaths) {
+    super(i, velocity, location, size, imagePaths);
     this.pg = pg;
     this.ratio = getScale(new Dimension(i.width, i.height), new Dimension(pg.width, pg.height));
-    println(this.ratio);
   }
 
   @Override
@@ -232,10 +236,16 @@ class ElementBounded extends Element {
   }
 
   @Override
+    ElementBounded update() {
+    this.updateSize();
+    this.updateLocation();
+    return this;
+  }
+
+  @Override
     ElementBounded setImage(PImage i) {
     this.img = i;
     this.ratio = getScale(new Dimension(i.width, i.height), new Dimension(pg.width, pg.height));
-    println(this.ratio);
     return this;
   }
 
