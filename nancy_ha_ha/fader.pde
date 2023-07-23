@@ -1,7 +1,7 @@
 class Fader {
 
-  ElementBounded top;
-  ElementBounded bottom;
+  CoverageElement top;
+  CoverageElement bottom;
   int fadeSteps;
   int sessionSteps;
   int currentStep = 0;
@@ -13,7 +13,7 @@ class Fader {
   int[] modes = { BLEND, BLEND, BLEND, ADD, SUBTRACT, DARKEST, LIGHTEST,
     DIFFERENCE, EXCLUSION, MULTIPLY, SCREEN, REPLACE, FADE };
 
-  Fader (ElementBounded t, ElementBounded b, int fadeSteps, String[] images) {
+  Fader (CoverageElement t, CoverageElement b, int fadeSteps, String[] images) {
     this.top = t;
     this.bottom = b;
     this.fadeSteps = fadeSteps;
@@ -43,7 +43,7 @@ class Fader {
     if (this.currentStep >= this.sessionSteps) {
       PImage bkgnd = loadImage(getRandomFile(this.imagePaths));
       this.top.setImage(bkgnd);
-      ElementBounded temp = this.bottom;
+      CoverageElement temp = this.bottom;
       this.bottom = this.top;
       this.top = temp;
       this.currentStep = 0;

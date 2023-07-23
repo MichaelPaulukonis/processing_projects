@@ -3,9 +3,9 @@ class Layers {
   PImage[] components;
   PGraphics pg;
   Boolean dirty = true;
-  Element nancyElement;
-  ElementBounded borderElement;
-  Element freeFloater;
+  BoundedElement nancyBoundedElement;
+  CoverageElement borderBoundedElement;
+  BoundedElement freeFloater;
   Fader backgroundFader;
 
   Layers() {
@@ -28,13 +28,13 @@ class Layers {
     PImage bkgnd = loadImage(getRandomFile(backgrounds));
     PImage b2 = loadImage(getRandomFile(backgrounds));
 
-    OffsetVelocity velocity = new OffsetVelocity(); // straight-up added to offsetLocation
+    OffsetVelocityConfig velocity = new OffsetVelocityConfig(); // straight-up added to offsetLocation
     velocity.min = -10;
     velocity.max = 10;
     velocity.stepsMin = 5;
     velocity.stepsMax = 100;
 
-    OffsetSize size = new OffsetSize();
+    OffsetSizeConfig size = new OffsetSizeConfig();
     size.min = 1.1;
     size.max = 2;
     size.velocityMin = 0.001;
@@ -42,36 +42,36 @@ class Layers {
     size.sizeStepsMin = 5;
     size.sizeStepsMax = 20;
 
-    OffsetLocation location = new OffsetLocation();
+    OffsetLocationConfig location = new OffsetLocationConfig();
     location.xmin = -100; 
     location.xmax = 100; 
     location.ymin = -250;
     location.ymax = 250;
 
-    ElementBounded backgroundElement = new ElementBounded(bkgnd, velocity, location, size, pg, backgrounds);
-    ElementBounded background2 = new ElementBounded(b2, velocity, location, size, pg, backgrounds);
+    CoverageElement backgroundBoundedElement = new CoverageElement(bkgnd, velocity, location, size, pg, backgrounds);
+    CoverageElement background2 = new CoverageElement(b2, velocity, location, size, pg, backgrounds);
 
-    backgroundFader = new Fader(backgroundElement, background2, 20, backgrounds);
+    backgroundFader = new Fader(backgroundBoundedElement, background2, 20, backgrounds);
 
     dirty = true;
   }
 
-  Element setRandomFloater() {
+  BoundedElement setRandomFloater() {
     PImage floater = loadImage(getRandomFile(freeComponents));
 
-    OffsetVelocity velocity = new OffsetVelocity();
+    OffsetVelocityConfig velocity = new OffsetVelocityConfig();
     velocity.min = -20;
     velocity.max = 20;
     velocity.stepsMin = 5;
     velocity.stepsMax = 10;
 
-    OffsetLocation location = new OffsetLocation();
+    OffsetLocationConfig location = new OffsetLocationConfig();
     location.xmin = -1000;
     location.xmax = 100;
     location.ymin = -1000;
     location.ymax = 1000;
 
-    OffsetSize size = new OffsetSize();
+    OffsetSizeConfig size = new OffsetSizeConfig();
     size.min = 0.5;
     size.max = 2;
     size.velocityMin = -0.02;
@@ -79,27 +79,27 @@ class Layers {
     size.sizeStepsMin = 1;
     size.sizeStepsMax = 1;
 
-    freeFloater = new Element(floater, velocity, location, size, freeComponents);
+    freeFloater = new BoundedElement(floater, velocity, location, size, freeComponents);
     dirty = true;
     return freeFloater;
   }
 
-  Element setRandomNancy() {
+  BoundedElement setRandomNancy() {
     PImage nancy = loadImage(getRandomFile(nancys));
 
-    OffsetVelocity velocity = new OffsetVelocity();
+    OffsetVelocityConfig velocity = new OffsetVelocityConfig();
     velocity.min = -20;
     velocity.max = 20;
     velocity.stepsMin = 5;
     velocity.stepsMax = 10;
 
-    OffsetLocation location = new OffsetLocation();
+    OffsetLocationConfig location = new OffsetLocationConfig();
     location.xmin = -750;
     location.xmax = 750;
     location.ymin = -250;
     location.ymax = 750;
 
-    OffsetSize size = new OffsetSize();
+    OffsetSizeConfig size = new OffsetSizeConfig();
     size.min = 1;
     size.max = 1;
     size.velocityMin = 0;
@@ -107,34 +107,34 @@ class Layers {
     size.sizeStepsMin = 1;
     size.sizeStepsMax = 1;
 
-    nancyElement = new Element(nancy, velocity, location, size, nancys);
+    nancyBoundedElement = new BoundedElement(nancy, velocity, location, size, nancys);
     dirty = true;
-    return nancyElement;
+    return nancyBoundedElement;
   }
 
-  Element newNancyImage() {
+  BoundedElement newNancyImage() {
     PImage nancy = loadImage(getRandomFile(nancys));
-    nancyElement.setImage(nancy);
+    nancyBoundedElement.setImage(nancy);
     dirty = true;
-    return nancyElement;
+    return nancyBoundedElement;
   }
 
   PImage setRandomBorder() {
     borderOverlay = loadImage(getRandomFile(overlays));
 
-    OffsetVelocity velocity = new OffsetVelocity();
+    OffsetVelocityConfig velocity = new OffsetVelocityConfig();
     velocity.min = -1;
     velocity.max = 1;
     velocity.stepsMin = 5;
     velocity.stepsMax = 20;
 
-    OffsetLocation location = new OffsetLocation();
+    OffsetLocationConfig location = new OffsetLocationConfig();
     location.xmin = -10;
     location.xmax = 10;
     location.ymin = -10;
     location.ymax = 10;
 
-    OffsetSize size = new OffsetSize();
+    OffsetSizeConfig size = new OffsetSizeConfig();
     size.min = 1.0;
     size.max = 1.02;
     size.velocityMin = 0;
@@ -142,21 +142,21 @@ class Layers {
     size.sizeStepsMin = 1;
     size.sizeStepsMax = 1;
 
-    borderElement = new ElementBounded(borderOverlay, velocity, location, size, pg, overlays);
+    borderBoundedElement = new CoverageElement(borderOverlay, velocity, location, size, pg, overlays);
 
     dirty = true;
     return borderOverlay;
   }
 
   void moveNancy() {
-    nancyElement.update();
+    nancyBoundedElement.update();
     dirty = true;
   }
 
   void update() {
     freeFloater.update();
-    nancyElement.update();
-    borderElement.update();
+    nancyBoundedElement.update();
+    borderBoundedElement.update();
     backgroundFader.update();
     dirty = true;
   }
@@ -184,16 +184,16 @@ class Layers {
       (int) (imageSize.height * rt));
   }
 
-  void drawElement(Element elem) {
-    pg.image(elem.image(), elem.locationOffset().x, elem.locationOffset().y,
+  void drawBoundedElement(BoundedElement elem) {
+    pg.image(elem.image(), elem.location().x, elem.location().y,
       pg.width * elem.size(), pg.height * elem.size());
   }
 
   // make this part of the fader
   // heck, it might be part of each element, come to think of it
   // in which case.....
-  void drawElement2(ElementBounded elem) {
-    pg.image(elem.image(), 0 - elem.locationOffset().x, 0 - elem.locationOffset().y,
+  void drawBoundedElement2(CoverageElement elem) {
+    pg.image(elem.image(), 0 - elem.location().x, 0 - elem.location().y,
       elem.ratio * elem.image().width, elem.ratio * elem.image().height);
   }
 
@@ -206,9 +206,9 @@ class Layers {
     pg.imageMode(CORNER);
     pg.image(backgroundFader.render(), 0, 0);
     pg.blendMode(BLEND);
-    drawElement(freeFloater);
-    drawElement(nancyElement);
-    drawElement2(borderElement);
+    drawBoundedElement(freeFloater);
+    drawBoundedElement(nancyBoundedElement);
+    drawBoundedElement2(borderBoundedElement);
     pg.endDraw();
     dirty = false;
     return this;

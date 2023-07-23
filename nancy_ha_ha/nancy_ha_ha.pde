@@ -96,3 +96,13 @@ void keyReleased() {
     if (keyCode == SHIFT) shiftIsPressed = false;
   }
 }
+
+/**
+
+TODO: 
+ - images change automaticlly
+ - movement "bounces" off edges (and... corners?)
+ - keys to pick/next/random components
+ - 
+
+**/

@@ -6,3 +6,5 @@
 *.gif
 *.jpeg
 .DS_Store
+*.autosave
+.vscode/
