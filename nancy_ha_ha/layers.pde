@@ -28,13 +28,13 @@ class Layers {
     PImage bkgnd = loadImage(getRandomFile(backgrounds));
     PImage b2 = loadImage(getRandomFile(backgrounds));
 
-    OffsetVelocityConfig velocity = new OffsetVelocityConfig(); // straight-up added to offsetLocation
+    LocationVelocityConfig velocity = new LocationVelocityConfig(); // straight-up added to offsetLocation
     velocity.min = -10;
     velocity.max = 10;
     velocity.stepsMin = 5;
     velocity.stepsMax = 100;
 
-    OffsetSizeConfig size = new OffsetSizeConfig();
+    SizeConfig size = new SizeConfig();
     size.min = 1.1;
     size.max = 2;
     size.velocityMin = 0.001;
@@ -42,7 +42,7 @@ class Layers {
     size.sizeStepsMin = 5;
     size.sizeStepsMax = 20;
 
-    OffsetLocationConfig location = new OffsetLocationConfig();
+    LocationConfig location = new LocationConfig();
     location.xmin = -100; 
     location.xmax = 100; 
     location.ymin = -250;
@@ -59,19 +59,19 @@ class Layers {
   BoundedElement setRandomFloater() {
     PImage floater = loadImage(getRandomFile(freeComponents));
 
-    OffsetVelocityConfig velocity = new OffsetVelocityConfig();
+    LocationVelocityConfig velocity = new LocationVelocityConfig();
     velocity.min = -20;
     velocity.max = 20;
     velocity.stepsMin = 5;
     velocity.stepsMax = 10;
 
-    OffsetLocationConfig location = new OffsetLocationConfig();
+    LocationConfig location = new LocationConfig();
     location.xmin = -1000;
     location.xmax = 100;
     location.ymin = -1000;
     location.ymax = 1000;
 
-    OffsetSizeConfig size = new OffsetSizeConfig();
+    SizeConfig size = new SizeConfig();
     size.min = 0.5;
     size.max = 2;
     size.velocityMin = -0.02;
@@ -87,19 +87,19 @@ class Layers {
   BoundedElement setRandomNancy() {
     PImage nancy = loadImage(getRandomFile(nancys));
 
-    OffsetVelocityConfig velocity = new OffsetVelocityConfig();
+    LocationVelocityConfig velocity = new LocationVelocityConfig();
     velocity.min = -20;
     velocity.max = 20;
     velocity.stepsMin = 5;
     velocity.stepsMax = 10;
 
-    OffsetLocationConfig location = new OffsetLocationConfig();
+    LocationConfig location = new LocationConfig();
     location.xmin = -750;
     location.xmax = 750;
     location.ymin = -250;
     location.ymax = 750;
 
-    OffsetSizeConfig size = new OffsetSizeConfig();
+    SizeConfig size = new SizeConfig();
     size.min = 1;
     size.max = 1;
     size.velocityMin = 0;
@@ -122,19 +122,19 @@ class Layers {
   PImage setRandomBorder() {
     borderOverlay = loadImage(getRandomFile(overlays));
 
-    OffsetVelocityConfig velocity = new OffsetVelocityConfig();
+    LocationVelocityConfig velocity = new LocationVelocityConfig();
     velocity.min = -1;
     velocity.max = 1;
     velocity.stepsMin = 5;
     velocity.stepsMax = 20;
 
-    OffsetLocationConfig location = new OffsetLocationConfig();
+    LocationConfig location = new LocationConfig();
     location.xmin = -10;
     location.xmax = 10;
     location.ymin = -10;
     location.ymax = 10;
 
-    OffsetSizeConfig size = new OffsetSizeConfig();
+    SizeConfig size = new SizeConfig();
     size.min = 1.0;
     size.max = 1.02;
     size.velocityMin = 0;

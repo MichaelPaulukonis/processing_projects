@@ -1,27 +1,3 @@
-class OffsetVelocityConfig {
-  int min;
-  int max;
-  int stepsMin;
-  int stepsMax;
-}
-
-// xmin should never be less than pg.width/2
-class OffsetLocationConfig {
-  int xmin;
-  int xmax;
-  int ymin;
-  int ymax;
-}
-
-class OffsetSizeConfig {
-  float min;
-  float max;
-  float velocityMin;
-  float velocityMax;
-  int sizeStepsMin;
-  int sizeStepsMax;
-}
-
 class BoundedElement {
   PVector location; // it's not an offset, it's the atual location
   PVector locationVelocity;
@@ -51,43 +27,38 @@ class BoundedElement {
   int sizeStepsMax;
   String[] imagePaths;
 
-  BoundedElement(PImage i, OffsetVelocityConfig velocity, OffsetLocationConfig location, OffsetSizeConfig size, String[] images) {
-    setOffsetVelocity(velocity.min, velocity.max, velocity.stepsMin, velocity.stepsMax);
-    setLocationOffset(location.xmin, location.xmax, location.ymin, location.ymax);
+  BoundedElement(PImage i, LocationVelocityConfig velocity, LocationConfig location, SizeConfig size, String[] images) {
+    setVelocity(velocity.min, velocity.max, velocity.stepsMin, velocity.stepsMax);
+    setLocation(location.xmin, location.xmax, location.ymin, location.ymax);
     setSizeVelocity(size.min, size.max, size.velocityMin, size.velocityMax, size.sizeStepsMin, size.sizeStepsMax);
     this.imagePaths = images;
     img = i;
     temp = createGraphics(2000, 2000);
   }
 
-  BoundedElement(PImage i, OffsetVelocityConfig velocity,
-    OffsetLocationConfig location, OffsetSizeConfig size, String[] images, PGraphics pg) {
+  // atm used only by sub-class CoverageElement
+  BoundedElement(PImage i, LocationVelocityConfig velocity,
+    LocationConfig location, SizeConfig size, String[] images, PGraphics pg) {
     this(i, velocity, location, size, images);
-    setOffsetVelocity(velocity.min, velocity.max, velocity.stepsMin, velocity.stepsMax);
-    setLocationOffset(location.xmin, location.xmax, location.ymin, location.ymax);
-    setSizeVelocity(size.min, size.max, size.velocityMin, size.velocityMax, size.sizeStepsMin, size.sizeStepsMax);
-    this.imagePaths = images;
-    img = i;
-    temp = createGraphics(2000, 2000);
     this.boundary = new Dimension(pg.width, pg.height);
   }
 
   // values in here are pretty much for the nancy element
-  void setLocationOffset() {
-    setLocationOffset(-750, 750, -250, 750);
+  void setLocation() {
+    setLocation(-750, 750, -250, 750);
   }
 
-  void setLocationOffset(int xmin, int xmax, int ymin, int ymax) {
+  void setLocation(int xmin, int xmax, int ymin, int ymax) {
     int x = (int)random(xmin, xmax);
     int y =(int)random(ymin, ymax);
     location = new PVector(x, y);
   }
 
-  void setOffsetVelocity() {
-    setOffsetVelocity(-20, 20, 5, 10);
+  void setVelocity() {
+    setVelocity(-20, 20, 5, 10);
   }
 
-  void setOffsetVelocity(int min, int max, int stepsMin, int stepsMax) {
+  void setVelocity(int min, int max, int stepsMin, int stepsMax) {
     this.offsetVelocityMin = min;
     this.offsetVelocityMax = max;
     this.offsetVelocityStepsMin = stepsMin;
@@ -206,78 +177,6 @@ class BoundedElement {
     temp.clear();
     temp.image(img, location.x, location.y,
       2000 * size(), 2000 * size());
-    return temp;
-  }
-}
-
-// >this< this not the "bounded" element - it's the COVERAGE element
-// if covers the entire window
-// the OTHER class should stay w/in the bounds
-class CoverageElement extends BoundedElement {
-
-  PGraphics pg; // overkill - just need size
-  Dimension d;
-  float ratio;
-  
-  float getScale(Dimension imageSize, Dimension boundary) {
-
-    double widthRatio = boundary.getWidth() / imageSize.getWidth();
-    double heightRatio = boundary.getHeight() / imageSize.getHeight();
-    double r = Math.max(widthRatio, heightRatio);
-
-    double mod = Math.min((r * random(1, 5)), this.sizeMax * r);
-    return (float)mod;
-  }
-
-  CoverageElement(PImage i, OffsetVelocityConfig velocity, OffsetLocationConfig location, OffsetSizeConfig size, PGraphics pg, String[] imagePaths) {
-    super(i, velocity, location, size, imagePaths, pg);
-    this.pg = pg;
-    this.ratio = getScale(new Dimension(i.width, i.height), this.boundary);
-  }
-
-  @Override
-    CoverageElement updateLocation() {
-    // location is a vector
-    // it should prolly be an object that only exposes the location
-    // but auto-constrains itself
-    location.add(locationVelocity);
-    currentStep++;
-    if (currentStep >= steps) {
-      resetOffsetVelocity();
-    }
-
-    // use the boundary instead
-    float offsetX = constrain(location.x, 0, img.width * ratio - pg.width);
-    float offsetY = constrain(location.y, 0, img.height * ratio - pg.height);
-
-    location.x = offsetX;
-    location.y = offsetY;
-
-    return this;
-  }
-
-  @Override
-    CoverageElement update() {
-    this.updateSize();
-    this.updateLocation();
-    return this;
-  }
-
-  @Override
-    CoverageElement setImage(PImage i) {
-    this.img = i;
-    this.ratio = getScale(new Dimension(i.width, i.height), new Dimension(pg.width, pg.height));
-    return this;
-  }
-
-  @Override
-    PGraphics render() {
-    temp.beginDraw();
-    temp.clear();
-    temp.background(255);
-    temp.image(this.img, 0 - location.x, 0 - location.y,
-      ratio * img.width, ratio * img.height);
-    temp.endDraw();
     return temp;
   }
 }
