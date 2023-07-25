@@ -26,21 +26,25 @@ class CoverageElement extends BoundedElement {
 
   @Override
     CoverageElement updateLocation() {
-    // location is a vector
-    // it should prolly be an object that only exposes the location
-    // but auto-constrains itself
     location.add(locationVelocity);
     currentStep++;
     if (currentStep >= steps) {
-      resetOffsetVelocity();
+      resetLocationVelocity();
+    }
+
+    // needs to take ratio into account
+    if (location.x < this.bounds.xmin || location.x > bounds.xmax + 2000 * size()) {
+      locationVelocity.x = -locationVelocity.x;
+    }
+    if (location.y < this.bounds.ymin || location.y > this.bounds.ymax + 2000 * size()) {
+      locationVelocity.y = -locationVelocity.y;
     }
 
     // use the boundary instead
     float offsetX = constrain(location.x, 0, img.width * ratio - pg.width);
     float offsetY = constrain(location.y, 0, img.height * ratio - pg.height);
 
-    location.x = offsetX;
-    location.y = offsetY;
+    location = new PVector(offsetX, offsetY);
 
     return this;
   }

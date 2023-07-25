@@ -9,8 +9,13 @@ class LocationVelocityConfig {
 class LocationConfig {
   int xmin;
   int xmax;
-  int ymin;
+  int ymin; 
   int ymax;
+
+  @Override
+    public String toString() {
+        return "[ " + xmin + ", " + xmax + ", " + ymin + ", " + ymax + " ]";"
+    }
 }
 
 class SizeConfig {

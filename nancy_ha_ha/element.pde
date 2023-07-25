@@ -10,6 +10,7 @@ class BoundedElement {
   PImage img;
   PGraphics temp;
   Dimension boundary;
+  LocationConfig bounds;
 
   int offsetVelocityMin;
   int offsetVelocityMax;
@@ -27,28 +28,18 @@ class BoundedElement {
   int sizeStepsMax;
   String[] imagePaths;
 
-  BoundedElement(PImage i, LocationVelocityConfig velocity, LocationConfig location, SizeConfig size, String[] images) {
+  BoundedElement(PImage i, LocationVelocityConfig velocity, LocationConfig location, SizeConfig size, String[] images, PGraphics pg) {
     setVelocity(velocity.min, velocity.max, velocity.stepsMin, velocity.stepsMax);
-    setLocation(location.xmin, location.xmax, location.ymin, location.ymax);
+    setLocation(location);
     setSizeVelocity(size.min, size.max, size.velocityMin, size.velocityMax, size.sizeStepsMin, size.sizeStepsMax);
     this.imagePaths = images;
-    img = i;
-    temp = createGraphics(2000, 2000);
-  }
-
-  // atm used only by sub-class CoverageElement
-  BoundedElement(PImage i, LocationVelocityConfig velocity,
-    LocationConfig location, SizeConfig size, String[] images, PGraphics pg) {
-    this(i, velocity, location, size, images);
     this.boundary = new Dimension(pg.width, pg.height);
+    this.img = i;
+    this.temp = createGraphics(2000, 2000);
   }
 
-  // values in here are pretty much for the nancy element
-  void setLocation() {
-    setLocation(-750, 750, -250, 750);
-  }
-
-  void setLocation(int xmin, int xmax, int ymin, int ymax) {
+  void setLocation(LocationConfig loc) {
+    this.bounds = loc;
     int x = (int)random(xmin, xmax);
     int y =(int)random(ymin, ymax);
     location = new PVector(x, y);
@@ -63,11 +54,10 @@ class BoundedElement {
     this.offsetVelocityMax = max;
     this.offsetVelocityStepsMin = stepsMin;
     this.offsetVelocityStepsMax = stepsMax;
-    resetOffsetVelocity();
+    resetLocationVelocity();
   }
 
-  // TODO: need a bounce and bounded someway
-  void resetOffsetVelocity() {
+  void resetLocationVelocity() {
     locationVelocity = new PVector(random(this.offsetVelocityMin, this.offsetVelocityMax), random(this.offsetVelocityMin, this.offsetVelocityMax));
     steps = (int)random(this.offsetVelocityStepsMin, this.offsetVelocityStepsMax);
     currentStep = 0;
@@ -77,11 +67,8 @@ class BoundedElement {
     sizeVelocity = random(svMin, svMax);
   }
 
-  // hunh, do I even need this?
-  // not if we're using min/max - it's just how long it takes
-  // which will simplify things nice
   void setSizeSteps(int stepsMin, int stepsMax) {
-    sizeSteps = (int)random(stepsMin, stepsMax);
+    this.sizeSteps = (int)random(stepsMin, stepsMax);
   }
 
   void setSizeVelocity() {
@@ -127,15 +114,19 @@ class BoundedElement {
     return this;
   }
 
-  // TODO: uh.... bounce off edges?
-  // but what about the larger-than-window images???
-  //PVector locationVelocity;
   BoundedElement updateLocation() {
     location.add(locationVelocity);
-    // now check, if outside bounds, multiple x pr y by -1
+    // width, but ratio?
+    if (location.x < this.bounds.xmin || location.x > bounds.xmax + 2000 * size()) {
+      locationVelocity.x = -locationVelocity.x;
+    }
+    if (location.y < this.bounds.ymin || location.y > this.bounds.ymax + 2000 * size()) {
+      locationVelocity.y = -locationVelocity.y;
+    }
+
     currentStep++;
-    if (currentStep >= steps) {
-      resetOffsetVelocity();
+    if (currentStep >= this.steps) {
+      resetLocationVelocity();
     }
     return this;
   }
@@ -172,11 +163,12 @@ class BoundedElement {
     return img;
   }
 
+  // this forces everything to be a square, doesn't it???
   PGraphics render() {
     temp.beginDraw();
     temp.clear();
     temp.image(img, location.x, location.y,
-      2000 * size(), 2000 * size());
+      2000 * size(), 2000 * size()); // 2000 should be a variable
     return temp;
   }
 }

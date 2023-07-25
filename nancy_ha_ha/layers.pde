@@ -29,24 +29,25 @@ class Layers {
     PImage b2 = loadImage(getRandomFile(backgrounds));
 
     LocationVelocityConfig velocity = new LocationVelocityConfig(); // straight-up added to offsetLocation
-    velocity.min = -10;
-    velocity.max = 10;
+    velocity.min = -40;
+    velocity.max = 50;
     velocity.stepsMin = 5;
-    velocity.stepsMax = 100;
+    velocity.stepsMax = 10;
 
     SizeConfig size = new SizeConfig();
-    size.min = 1.1;
+    size.min = 0.9;
     size.max = 2;
     size.velocityMin = 0.001;
     size.velocityMax = 0.01;
     size.sizeStepsMin = 5;
-    size.sizeStepsMax = 20;
+    size.sizeStepsMax = 40;
 
+    // hunh not sure if right values
     LocationConfig location = new LocationConfig();
-    location.xmin = -100; 
-    location.xmax = 100; 
-    location.ymin = -250;
-    location.ymax = 250;
+    location.xmin = -500; 
+    location.xmax = 500; 
+    location.ymin = -750;
+    location.ymax = 750;
 
     CoverageElement backgroundBoundedElement = new CoverageElement(bkgnd, velocity, location, size, pg, backgrounds);
     CoverageElement background2 = new CoverageElement(b2, velocity, location, size, pg, backgrounds);
@@ -60,14 +61,14 @@ class Layers {
     PImage floater = loadImage(getRandomFile(freeComponents));
 
     LocationVelocityConfig velocity = new LocationVelocityConfig();
-    velocity.min = -20;
-    velocity.max = 20;
-    velocity.stepsMin = 5;
-    velocity.stepsMax = 10;
+    velocity.min = -40;
+    velocity.max = 40;
+    velocity.stepsMin = 10;
+    velocity.stepsMax = 100;
 
     LocationConfig location = new LocationConfig();
     location.xmin = -1000;
-    location.xmax = 100;
+    location.xmax = 1000;
     location.ymin = -1000;
     location.ymax = 1000;
 
@@ -79,7 +80,7 @@ class Layers {
     size.sizeStepsMin = 1;
     size.sizeStepsMax = 1;
 
-    freeFloater = new BoundedElement(floater, velocity, location, size, freeComponents);
+    freeFloater = new BoundedElement(floater, velocity, location, size, freeComponents, pg);
     dirty = true;
     return freeFloater;
   }
@@ -88,26 +89,26 @@ class Layers {
     PImage nancy = loadImage(getRandomFile(nancys));
 
     LocationVelocityConfig velocity = new LocationVelocityConfig();
-    velocity.min = -20;
-    velocity.max = 20;
+    velocity.min = -40;
+    velocity.max = 40;
     velocity.stepsMin = 5;
-    velocity.stepsMax = 10;
+    velocity.stepsMax = 100;
 
     LocationConfig location = new LocationConfig();
-    location.xmin = -750;
-    location.xmax = 750;
+    location.xmin = -250;
+    location.xmax = 250;
     location.ymin = -250;
-    location.ymax = 750;
+    location.ymax = 250;
 
     SizeConfig size = new SizeConfig();
     size.min = 1;
     size.max = 1;
-    size.velocityMin = 0;
-    size.velocityMax = 0;
-    size.sizeStepsMin = 1;
-    size.sizeStepsMax = 1;
+    size.velocityMin = -1;
+    size.velocityMax = 1;
+    size.sizeStepsMin = 10;
+    size.sizeStepsMax = 100;
 
-    nancyBoundedElement = new BoundedElement(nancy, velocity, location, size, nancys);
+    nancyBoundedElement = new BoundedElement(nancy, velocity, location, size, nancys, pg);
     dirty = true;
     return nancyBoundedElement;
   }
@@ -123,24 +124,24 @@ class Layers {
     borderOverlay = loadImage(getRandomFile(overlays));
 
     LocationVelocityConfig velocity = new LocationVelocityConfig();
-    velocity.min = -1;
-    velocity.max = 1;
-    velocity.stepsMin = 5;
-    velocity.stepsMax = 20;
+    velocity.min = -2;
+    velocity.max = 2;
+    velocity.stepsMin = 20;
+    velocity.stepsMax = 100;
 
     LocationConfig location = new LocationConfig();
-    location.xmin = -10;
-    location.xmax = 10;
-    location.ymin = -10;
-    location.ymax = 10;
+    location.xmin = -20;
+    location.xmax = 20;
+    location.ymin = -20;
+    location.ymax = 20;
 
     SizeConfig size = new SizeConfig();
-    size.min = 1.0;
+    size.min = 0.95;
     size.max = 1.02;
-    size.velocityMin = 0;
-    size.velocityMax = 0;
-    size.sizeStepsMin = 1;
-    size.sizeStepsMax = 1;
+    size.velocityMin = 0.01;
+    size.velocityMax = 0.02;
+    size.sizeStepsMin = 10;
+    size.sizeStepsMax = 100;
 
     borderBoundedElement = new CoverageElement(borderOverlay, velocity, location, size, pg, overlays);
 
@@ -154,7 +155,7 @@ class Layers {
   }
 
   void update() {
-    freeFloater.update();
+    // freeFloater.update();
     nancyBoundedElement.update();
     borderBoundedElement.update();
     backgroundFader.update();
